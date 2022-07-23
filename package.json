@@ -1,0 +1,28 @@
+{
+  "name": "share_your_ride",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "*",
+    "body-parser": "*",
+    "connect-flash": "*",
+    "cookie-parser": "^1.4.1",
+    "express": "^4.16.4",
+    "express-handlebars": "*",
+    "express-messages": "*",
+    "express-session": "*",
+    "express-validator": "*",
+    "mongodb": "^3.1.10",
+    "mongoose": "*",
+    "passport": "^0.4.0",
+    "passport-http": "*",
+    "passport-local": "*",
+    "socket.io": "^2.2.0"
+  }
+}

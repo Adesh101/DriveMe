@@ -1,0 +1,100 @@
+ 
+ <div id='map'></div> 
+<div class="panel1">
+    
+    {{#if local}}
+    <form method="POST" action="/users/sendconfirm">
+
+        <input type="hidden" name="req_id" value="{{local.id}}">
+        
+        <ul style="margin:10px;font-size:24px;">
+            <li><b>Requesting User:</b><strong>{{local.name}}</strong></li>
+            <li><b>PickUp location:</b><strong>{{local.pickuplocation}}</strong></li>
+            <li><b>PickUp Time:</b><strong>{{local.time}}</strong></li>
+        </ul>
+        <center><button type="submit" class="confirm">Confirm</button></center>
+    </form>
+    {{/if}}
+</div>
+<div class="pan3">
+                     <center><h3>Confirmed</h3></center>
+                     <center><img src="/images/true.png"  class="responsive-img" style="width:100px;height:100px;"></center>
+                     <p class="insert"></p>
+                       
+
+</div>
+        <script>
+                      
+                    
+                (function()
+{
+    
+    try{
+
+        
+        if (navigator.geolocation) {
+            
+        navigator.geolocation.getCurrentPosition(showPosition);
+        
+        } else { 
+            alert("Geolocation is not supported by this browser.");
+        }
+        }
+        catch(error)
+        {
+            alert("Something went wrong");
+        }
+        
+    function getLocation()
+    {
+        //alert("entered");
+        try{
+
+        
+        if (navigator.geolocation) {
+            
+        navigator.geolocation.getCurrentPosition(showPosition);
+        
+        } else { 
+            alert("Geolocation is not supported by this browser.");
+        }
+        }
+        catch(error)
+        {
+            console.log("error");
+        }     
+    }
+    function showPosition(position) {
+    
+        
+        long=position.coords.longitude;
+        lat=position.coords.latitude;
+        //alert(long+lat);
+        mapboxgl.accessToken = 'pk.eyJ1IjoiNTEwMDU2MTAiLCJhIjoiY2psbndoMWduMWltMTNxbDRmeGRxdXNqbSJ9.mI6QwCnYcfIr27D07hnmQA';
+        var directions = new MapboxDirections({
+        accessToken: mapboxgl.accessToken,
+        unit: 'metric',
+        profile: 'mapbox/driving',
+        controls: {
+                inputs: false,
+                instructions: true,
+                profileSwitcher: false  
+            }
+
+        });
+        var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v10',
+        center:[long,lat],//long,lat
+        zoom:13.5
+        });
+        directions.setOrigin([long, lat]);
+        directions.setDestination([{{local.longitude}},{{local.latitude}}]);    
+        map.addControl(directions, 'top-left');
+
+    }
+  
+})();
+
+
+        </script>

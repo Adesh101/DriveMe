@@ -1,0 +1,14 @@
+<script type="text/javascript">
+  window.onbeforeunload = confirmExit;
+  function confirmExit()
+  {
+    return "Do you want to leave this page without saving?";
+  }
+</script>
+
+<h1>Confirmed</h1>
+<form action="/users/reqrating" method="POST">
+<input type="hidden" value="{{req}}"/>
+<input type="submit" value="Ride Completed?" class="confirm"/>
+
+</form>

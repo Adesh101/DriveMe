@@ -1,0 +1,34 @@
+<table style="background-color: rgba(0,0,0,0.6);width: 98%; 
+    margin-left: auto;
+    margin-right: auto;" class="table table-striped table-dark">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">To</th>
+      <th scope="col">Where</th>
+      <th scope="col">Pickup</th>
+      <th scope="col">Time</th>
+      <th scope="col">Date</th>
+    </tr>
+  </thead>
+  <tbody id=
+  "content">
+     </tbody>
+</table>
+<script>
+  var i=1;
+                          {{#each arr}}
+                                console.log(this.id);
+                       //         var x = document.getElementsByTagName('TBODY');
+                                var newHtml='<tr><td>'+i+'</td><td>%to%</td><td>%where%</td><td>%pickup%</td><td>%time%</td><td>%date%</td></tr>';
+                                newHtml=newHtml.replace('%to%','{{this.to}}');
+                                newHtml=newHtml.replace('%where%','{{this.where}}');
+                                newHtml=newHtml.replace('%pickup%','{{this.pickuplocation}}');
+                                newHtml=newHtml.replace('%time%','{{this.time}}');
+                                newHtml=newHtml.replace('%date%','{{this.date}}');
+                                i++;
+                                document.querySelector('#content').insertAdjacentHTML('beforeend', newHtml);
+                          {{/each}}
+
+
+</script>

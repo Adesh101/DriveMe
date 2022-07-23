@@ -1,0 +1,150 @@
+ <script>
+    var i=0;
+                    
+    
+ </script>
+ <center><h3>Your Location</h3></center>
+ <div id='map'></div>
+  
+           <center><h3>Requests</h3></center>
+            <div class="about">
+                <!--<form method="POST" action="/users/confirmride">-->
+                    <ul class="list" id="list">
+                    
+                        
+        
+                    </ul>
+                
+            </div>
+
+            <script type="text/javascript">
+                   var arr=[];
+                  
+             var socket=io.connect('http://localhost:4800');
+
+                        console.log(socket);
+                        socket.emit('findRequests',{data:'hello'});
+                        socket.on('resultRequests', function (data) {
+                             var myNode = document.getElementById("list");
+                                while (myNode.firstChild) {
+                                    console.log("remove");
+                                    myNode.removeChild(myNode.firstChild);
+                                }
+                                //i=0;
+                        console.log(data.arr1.length);
+                        for(var i=0;i<data.arr1.length;i++)
+                         {
+                            
+                         var newHtml='<form method="POST" action="/users/confirmride"><li><p><span><strong>%name%</strong></span> is requesting.<br>His location is <span><strong>%location%</strong></span></p><input type="hidden" value="%id%" name="req_id"><button type="submit" class="accept" id="%id%" >View</button></li></form>';
+                                newHtml=newHtml.replace('%id%',data.arr1[i].id);
+                                newHtml=newHtml.replace('%name%',data.arr1[i].name);
+                                newHtml=newHtml.replace('%location%',data.arr1[i].pickuplocation);
+                                document.querySelector('.list').insertAdjacentHTML('beforeend', newHtml);
+                           
+                         }
+  });
+                         /*{{#each arr}}
+                            console.log(this.id);
+                                var newHtml='<form method="POST" action="/users/confirmride"><li><p><span><strong>%name%</strong></span> is requesting.<br>His location is <span><strong>%location%</strong></span></p><input type="hidden" value="%id%" name="req_id"><button type="submit" class="accept" id="%id%" >View</button></li></form>';
+                                newHtml=newHtml.replace('%id%','{{this.id}}');
+                                newHtml=newHtml.replace('%name%','{{this.name}}');
+                                newHtml=newHtml.replace('%location%','{{this.pickuplocation}}');
+                                document.querySelector('.list').insertAdjacentHTML('beforeend', newHtml);
+                            {{/each}}
+*/
+
+                /*console.log("good");
+                console.log({{arr.length}});
+                {{#each arr}}
+                    var newHtml='<form method="POST" action="/users/confirmride"><li><p><span><strong>%name%</strong></span> is requesting.<br>His location is <span><strong>%location%</strong></span></p><input type="hidden" value="%id%" name="req_id"><button type="submit" class="accept" id="%id%" >View</button></li></form>';
+                                 newHtml=newHtml.replace('%id%','{{this.id}}');
+                                newHtml=newHtml.replace('%name%','{{this.name}}');
+                                newHtml=newHtml.replace('%location%','{{this.pickuplocation}}');
+                                document.querySelector('.list').insertAdjacentHTML('beforeend', newHtml);
+                {{/each}}
+                */
+                
+                (function()
+{
+    
+    try{
+
+        
+        if (navigator.geolocation) {
+            
+        navigator.geolocation.getCurrentPosition(showPosition);
+        
+        } else { 
+            alert("Geolocation is not supported by this browser.");
+        }
+        }
+        catch(error)
+        {
+            alert("Something went wrong");
+        }
+        
+    function getLocation()
+    {
+        //alert("entered");
+        try{
+
+        
+        if (navigator.geolocation) {
+            
+        navigator.geolocation.getCurrentPosition(showPosition);
+        
+        } else { 
+            alert("Geolocation is not supported by this browser.");
+        }
+        }
+        catch(error)
+        {
+            console.log("error");
+        }     
+    }
+    function showPosition(position) {
+    
+        
+        long=position.coords.longitude;
+        lat=position.coords.latitude;
+        //alert(long+lat);
+        mapboxgl.accessToken = 'pk.eyJ1IjoiNTEwMDU2MTAiLCJhIjoiY2psbndoMWduMWltMTNxbDRmeGRxdXNqbSJ9.mI6QwCnYcfIr27D07hnmQA';
+        var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v10',
+        center:[long,lat],//long,lat
+        zoom:13.5
+        });
+        var geojson = {
+        type: 'FeatureCollection',
+        features: [{
+            type: 'Feature',
+            geometry: {
+            type: 'Point',
+            coordinates: [long,lat]
+            },
+            properties: {
+            title: 'Mapbox',
+            description: 'Washington, D.C.'
+            }
+        }]
+    };
+        geojson.features.forEach(function(marker) {
+
+        // create a HTML element for each feature
+        var el = document.createElement('div');
+        el.className = 'marker';
+
+        // make a marker for each feature and add to the map
+        new mapboxgl.Marker(el)
+        .setLngLat(marker.geometry.coordinates)
+        new mapboxgl.Marker(el)
+        .setLngLat(marker.geometry.coordinates)
+        .setPopup(new mapboxgl.Popup({ offset: 25 }) // add popups
+        .setHTML('<h3>' + marker.properties.title + '</h3><p>' + marker.properties.description + '</p>'))
+        .addTo(map);        });
+        map.addControl(new mapboxgl.NavigationControl());
+    }
+})();
+         
+            </script>

@@ -1,0 +1,425 @@
+<style>
+    @import "lesshat";
+
+@starColour: #16a085;
+@starHoverColour: #1abc9c;
+
+.star-rating { 
+  font-family: 'FontAwesome'; 
+  margin: 50px auto;
+  
+  > fieldset {
+    border: none;
+    display: inline-block;
+    
+    &:not(:checked) {
+      > input {
+        position: absolute;
+        top: -9999px;
+        clip: rect(0,0,0,0);
+      }
+
+      > label {
+        float: right;
+        width: 1em;
+        padding: 0 .05em;
+        overflow: hidden;
+        white-space: nowrap;
+        cursor: pointer;
+        font-size: 200%;
+        color: @starColour;
+        
+        &:before {
+          content: '\f006  ';
+        }
+        
+        &:hover,
+        &:hover ~ label {
+          color: @starHoverColour;
+          text-shadow: 0 0 3px @starHoverColour;
+          &:before {
+            content: '\f005  ';
+          }
+        }
+      }
+    }
+    
+    > input:checked {
+      & ~ label {
+        &:before {
+          content: '\f005  ';
+        }
+      }    
+    }    
+
+    > label:active {
+      position: relative;
+      top: 2px;
+    }
+  }
+}
+p {
+    font-size: 1.6em;
+    margin: auto;
+    width: 80%;
+  }
+  
+  a {
+    color: @starColour;
+  }
+</style>
+
+           <div id='map'></div> 
+           <pre id='coordinates' class='coordinates'></pre>
+
+           <div class="container1">
+
+               <div class="pan1">
+                    <center><h3>Drag black dot to set your pickup location</h3></center>
+                    
+                    <form class="confirmform" method="POST" action="/users/confirm">
+                        <center><p id='out' ></p></center>
+                    <input type="hidden" id="pickup" name="pickup"> 
+                    <input type="hidden" id="long" name="long"></p>
+                    <input type="hidden" id="lat" name="lat"></p>
+                                <div class="input-field col s6" >
+                                <input placeholder="Pickup Time" type="text" class="time" name="time" required>
+                                <center><button type="submit" class="confirm">Confirm</button></center>
+                                </div>
+                        </form>
+                </div>
+                <div class="pan2">
+                    <form action="/users/cancelRequest" method="POST">
+                     <center><h3>Waiting for request being accepted</h3></center>
+                     <center><img src="/images/loading.gif" style="border-radius:5px;box-shadow: 5px 10px 18px #888888;border:0;"></center><br>
+                       <center><button type="submit" class="confirm">Cancel Request</button></center>   
+                    </form>
+                </div>
+                <div class="pan3">
+                     <center><h3>Your Request is accepted</h3></center>
+                     <center><img src="/images/true.png"  class="responsive-img" style="width:100px;height:100px;"></center>
+                     <p class="insert"></p>
+                      <center><button type="submit" class="chat">Wanna chat?</button></center> 
+
+                </div>
+                <div class="pan4">
+                    <div class="star-rating">
+                    <fieldset>
+                        <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="Outstanding">5 stars</label>
+                        <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="Very Good">4 stars</label>
+                        <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="Good">3 stars</label>
+                        <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="Poor">2 stars</label>
+                        <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="Very Poor">1 star</label>
+                    </fieldset>
+                    <button value="check" onclick="get()"></button>
+                    </div>
+                </div>
+                <div class="pan5" style="display: none;">
+                    <center>
+                        <div class="row">
+                            <div class="col-md-6 offser-md-3 col-sm-12">
+                              
+                               
+                                   
+                                    <br>
+                                    <textarea id="textarea" class="form-control" placeholder="Enter message..." style="height: 300px;width:80%;margin:auto;font-size: 18px;"></textarea>
+                                        <button id="send" class="btn btn-danger" style="margin-top:10px;">Send</button>
+                                    </div>
+                            </div></center>
+                        </div>
+                    </div>
+                    </center>
+                </div>
+            </div>
+    <script>
+        try{
+            
+        
+        
+        var socket=io.connect('http://localhost:4800');
+        var req={{info.reqstatus}};
+
+         var temp="{{info.acceptedBy}}";
+        document.querySelector('.chat').addEventListener('click',function(){
+            document.querySelector('.pan3').style.display="none";    
+            document.querySelector('.pan5').style.display="block";
+            socket.emit('enablechat',temp);
+        });
+        checkStatus(req);
+        function checkStatus(reqstatus)
+                {
+                    console.log("reqstatus"+reqstatus);
+                    if(temp!="")
+                    {
+                        socket.emit('acceptedBy',temp);
+                    }
+                      
+                    if(reqstatus==0 || reqstatus==undefined )
+                    {
+                        console.log("undefined object");
+						document.querySelector('.pan2').style.display="none";
+						document.querySelector('.pan3').style.display="none";
+                         document.querySelector('.pan4').style.display="none";
+                        document.querySelector('.pan1').style.display="block";
+                       
+                    }
+                    if(reqstatus==1)
+                    {
+                        document.getElementById("map").style.display="none";
+                        document.querySelector('.pan1').style.display="none";
+                        document.querySelector('.pan3').style.display="none";
+                         document.querySelector('.pan4').style.display="none";
+                        document.querySelector('.pan2').style.display="block";    
+                    }
+                    if(reqstatus==2)
+                    {
+                        document.getElementById("map").style.display="none";
+                        document.querySelector('.pan1').style.display="none";
+                        document.querySelector('.pan2').style.display="none";
+                         document.querySelector('.pan4').style.display="none";
+                        document.querySelector('.pan3').style.display="block";
+                    }
+                    if(reqstatus==3)
+                    {
+                        document.getElementById("map").style.display="none";
+                        document.querySelector('.pan1').style.display="none";
+                        document.querySelector('.pan2').style.display="none";
+                        document.querySelector('.pan3').style.display="none";
+                        document.querySelector('.pan4').style.display="block";
+                    }
+                    console.log("temp"+temp);
+                }
+              
+         //console.log(socket);
+            //Check for connection
+            if(socket !== undefined)
+            {
+                console.log('Connected to socket....');
+               // socket.emit('checkReq');
+                 socket.on('output',function(data){
+                    console.log(data.reqstatus);
+                   socket.emit('acceptedBy',data.acceptedBy);
+                   if(data.reqstatus==0 || data.reqstatus==undefined )
+                    {
+                        console.log("undefined object");
+						document.querySelector('.pan2').style.display="none";
+						document.querySelector('.pan3').style.display="none";
+                        document.querySelector('.pan4').style.display="none";
+                        document.querySelector('.pan1').style.display="block";
+                       
+                    }
+                    if(data.reqstatus==1)
+                    {
+                        document.getElementById("map").style.display="none";
+                        document.querySelector('.pan1').style.display="none";
+                        document.querySelector('.pan3').style.display="none";
+                        document.querySelector('.pan4').style.display="none";
+                        document.querySelector('.pan2').style.display="block";    
+                    }
+                    if(data.reqstatus==2)
+                    {
+                        document.getElementById("map").style.display="none";
+                        document.querySelector('.pan1').style.display="none";
+                        document.querySelector('.pan2').style.display="none";
+                        document.querySelector('.pan4').style.display="none";
+                        document.querySelector('.pan3').style.display="block";
+                        
+                    }
+                     if(data.reqstatus==3)
+                    {
+                        document.getElementById("map").style.display="none";
+                        document.querySelector('.pan1').style.display="none";
+                        document.querySelector('.pan2').style.display="none";
+                        document.querySelector('.pan3').style.display="none";
+                        document.querySelector('.pan4').style.display="block";
+                        
+                    }
+                   
+                });
+                var acceptedBy;
+                socket.on('displayAccepted',function(data)
+                {
+                    console.log(data.name);
+                    console.log(data.id);
+                     acceptedBy=data.id;
+                      var myNode = document.querySelector('.insert');
+                                while (myNode.firstChild) {
+                                    console.log("remove");
+                                    myNode.removeChild(myNode.firstChild);
+                                }
+                    var html=" <ul style='margin:10px;font-size:24px;'><li><b>Ride Accepted By:</b><strong>"+data.name+"</strong></li><li><b>Mobile:</b><strong>"+data.mobile+"</strong></li><li><b>Vehicle:</b><strong>"+data.vehicle+"</strong></li></ul>";
+                    document.querySelector('.insert').insertAdjacentHTML('beforeend', html);
+                });
+                socket.emit('findRequests',{data:'hello'});
+               
+                document.querySelector('.chat').addEventListener('click',function(event)
+                {
+                    socket.emit('enableChat',temp);
+                });
+                /*document.querySelector('.confirm').addEventListener('click',function(event)
+                {
+                    alert("clicked");
+                    socket.emit('input',{
+                            val:1,
+                        });
+                        const Http = new XMLHttpRequest();
+                        const url='/users/confirm';
+                        Http.open("POST", url);
+                        Http.send();
+                        Http.onreadystatechange=(e)=>{
+                            console.log(Http.responseText)
+                        }
+                        event.preventDefault();
+                });*/
+            }
+        
+                if (navigator.geolocation) {
+                    
+                navigator.geolocation.getCurrentPosition(showPosition);
+                
+                } else { 
+                    alert("Geolocation is not supported by this browser.");
+                }
+        }
+        catch(error)
+        {
+            console.log(error);
+            alert("Something went wrong");
+        }
+
+
+        function showPosition(position)
+        {
+             
+            long=position.coords.longitude;
+            lat=position.coords.latitude;
+            document.getElementById('long').value=long;
+            document.getElementById('lat').value=lat;
+            mapboxgl.accessToken = 'pk.eyJ1IjoiZGFya3JhaTE5IiwiYSI6ImNqcHdvOTBnYTBoamg0NHFscjY4MWM5d2cifQ.TTBp3QZuSBuXKzCmsCN7MA';
+            var coordinates = document.getElementById('coordinates');
+            var map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v10',
+                center: [long,lat],
+                zoom:14
+            });
+
+            var canvas = map.getCanvasContainer();
+
+            var geojson = {
+                type: "FeatureCollection",
+                features: [{
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [long,lat]
+                    },
+                    properties: {
+                    title: 'Mapbox',
+                    description: 'Washington, D.C.'
+                    }
+                }]
+            };
+            
+            function onMove(e) {
+    var coords = e.lngLat;
+    // Set a UI indicator for dragging.
+    canvas.style.cursor = 'grabbing';
+
+    // Update the Point feature in `geojson` coordinates
+    // and call setData to the source layer `point` on it.
+    geojson.features[0].geometry.coordinates = [coords.lng, coords.lat];
+    map.getSource('point').setData(geojson);
+}
+
+function onUp(e) {
+    var coords = e.lngLat;
+
+    // Print the coordinates of where the point had
+    // finished being dragged to on the map.
+     document.getElementById('long').value=coords.lng;
+     document.getElementById('lat').value=coords.lat;
+    //coordinates.style.display = 'block';
+    //coordinates.innerHTML = 'Longitude: ' + coords.lng + '<br />Latitude: ' + coords.lat;
+    //canvas.style.cursor = '';
+
+    // Unbind mouse/touch events
+    map.off('mousemove', onMove);
+    map.off('touchmove', onMove);
+
+    //
+
+var url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + coords.lng + "," + coords.lat + ".json?access_token=" + mapboxgl.accessToken;
+    //document.getElementById("out").innerHTML =url;
+     $.get(url, function(data){
+        result(data);
+    });
+    function result(data) {
+        var name=data.features[0];
+        var na=name.place_name;
+        document.getElementById("pickup").value=na;
+        document.getElementById("out").innerHTML =na;
+    }
+
+    
+}
+
+map.on('load', function() {
+
+    // Add a single point to the map
+    map.addSource('point', {
+        "type": "geojson",
+        "data": geojson
+    });
+
+    map.addLayer({
+        "id": "point",
+        "type": "circle",
+        "source": "point",
+        "paint": {
+            "circle-radius":10,
+            "circle-color": "#000"
+        }
+    });
+
+    // When the cursor enters a feature in the point layer, prepare for dragging.
+    map.on('mouseenter', 'point', function() {
+        map.setPaintProperty('point', 'circle-color', '#3bb2d0');
+        canvas.style.cursor = 'move';
+    });
+
+    map.on('mouseleave', 'point', function() {
+        map.setPaintProperty('point', 'circle-color', '#3887be');
+        canvas.style.cursor = '';
+    });
+
+    map.on('mousedown', 'point', function(e) {
+        // Prevent the default map drag behavior.
+        e.preventDefault();
+
+        canvas.style.cursor = 'grab';
+
+        map.on('mousemove', onMove);
+        map.once('mouseup', onUp);
+    });
+
+    map.on('touchstart', 'point', function(e) {
+        if (e.points.length !== 1) return;
+
+        // Prevent the default map drag behavior.
+        e.preventDefault();
+
+        map.on('touchmove', onMove);
+        map.once('touchend', onUp);
+    });
+});
+
+    }
+
+        
+//
+
+//
+
+
+    </script>
